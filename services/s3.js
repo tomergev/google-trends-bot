@@ -10,7 +10,7 @@ module.exports = {
 		return new Promise((resolve, reject) => {
 			const params = {
 				Body: fileContent,
-				Bucket: process.env.AWS_BUCKET_NAME,
+				Bucket: process.env.S3_BUCKET_NAME,
 				Key: key,
 			}
 			s3.upload(params, (err, data) => err ? reject(err) : resolve(data))
