@@ -26,4 +26,4 @@ const job = async () => {
 
 const everyDay = '0 12 * * *' // CronJob occuring every day at noon
 new CronJob(everyDay, job, null, true, 'America/Los_Angeles')
-console.log(`CronJob occuring every ${everyDay} started`)
+console.log(`CronJob occuring every ${everyDay}`)
