@@ -9,7 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.742.0",
     "cron": "^1.8.2",
+    "dotenv": "^8.2.0",
     "google-trends-api": "^4.9.0"
   }
 }

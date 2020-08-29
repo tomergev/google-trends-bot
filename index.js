@@ -1,6 +1,7 @@
+require('dotenv').config()
 const CronJob = require('cron').CronJob
-const fs = require('fs')
 const googleTrends = require('google-trends-api')
+const s3 = require('./services/s3')
 
 const today = () => {
 	const now = new Date()
@@ -10,14 +11,19 @@ const today = () => {
 	return today
 }
 
-// CronJob occuring every day at noon
-new CronJob('0 12 * * *', async () => {
-  try {
+const job = async () => {
+	try {
 		const res = await googleTrends.dailyTrends({ geo: 'US' })
-		const filePath = `raw/${today()}_${Date.now()}.json`
-		await fs.writeFileSync(filePath, res)
-		console.log(`Successfully created file, path: ${filePath}`, res)
+		await s3.uploadFile({
+			fileContent: res,
+			key: `${today()}_${Date.now()}`,
+		})
+		console.log('Successfully uploaded to s3', res)
 	} catch (err) {
 		console.error(err)
 	}
-}, null, true, 'America/Los_Angeles')
+}
+
+const everyDay = '0 12 * * *' // CronJob occuring every day at noon
+new CronJob(everyDay, job, null, true, 'America/Los_Angeles')
+console.log(`CronJob occuring every ${everyDay} started`)
