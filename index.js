@@ -13,10 +13,11 @@ const today = () => {
 
 const job = async () => {
 	try {
-		const res = await googleTrends.dailyTrends({ geo: 'US' })
+		const geo = 'US'
+		const res = await googleTrends.dailyTrends({ geo })
 		await s3.uploadFile({
 			fileContent: res,
-			key: `${today()}_${Date.now()}`,
+			key: `${today()}_${geo}`,
 		})
 		console.log('Successfully uploaded to s3', res)
 	} catch (err) {
@@ -24,6 +25,6 @@ const job = async () => {
 	}
 }
 
-const everyDay = '0 12 * * *' // CronJob occuring every day at noon
+const everyDay = '0 20 * * *' // CronJob occuring every day at 20:00, 8pm
 new CronJob(everyDay, job, null, true, 'America/Los_Angeles')
 console.log(`CronJob occuring every ${everyDay}`)
