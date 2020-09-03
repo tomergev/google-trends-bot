@@ -3,12 +3,10 @@ const CronJob = require('cron').CronJob
 const googleTrends = require('google-trends-api')
 const s3 = require('./services/s3')
 
-const today = () => {
-	const now = new Date()
-	const day = ("0" + now.getDate()).slice(-2)
-	const month = ("0" + (now.getMonth() + 1)).slice(-2)
-	const today = `${now.getFullYear()}${month}${day}`
-	return today
+// Get the date from googleTrends.dailyTrends response
+const getDate = ({ default: res = {} } = {}) => {
+	const [{ date }] = res.trendingSearchesDays || []
+	return date
 }
 
 const job = async () => {
@@ -17,9 +15,9 @@ const job = async () => {
 		const res = await googleTrends.dailyTrends({ geo })
 		await s3.uploadFile({
 			fileContent: res,
-			key: `${today()}_${geo}`,
+			key: `${getDate(JSON.parse(res))}_${geo}`,
 		})
-		console.log('Successfully uploaded to s3', res)
+		console.log(res, 'Successfully uploaded to s3')
 	} catch (err) {
 		console.error(err)
 	}
