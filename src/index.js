@@ -2,6 +2,7 @@ require('dotenv').config()
 const CronJob = require('cron').CronJob
 const googleTrends = require('google-trends-api')
 const s3 = require('./services/s3')
+const { detect } = require('./services/googleCloudLanguage')
 
 // Get the date from googleTrends.dailyTrends response
 const getDate = ({ default: res = {} } = {}) => {
@@ -26,3 +27,5 @@ const job = async () => {
 const everyDay = '0 20 * * *' // CronJob occuring every day at 20:00, 8pm
 new CronJob(everyDay, job, null, true, 'America/Los_Angeles')
 console.log(`CronJob occuring every ${everyDay}`)
+
+detect()
