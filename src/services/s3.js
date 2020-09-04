@@ -12,7 +12,28 @@ const requiredParam = (param = 'key') => {
 }
 
 module.exports = {
-  async getObject({ key = requiredParam() } = {}) {
+  // Checking if the file name already exists in s3
+  checkFileName(key = requiredParam()) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const params = {
+          Bucket,
+          Key: key,
+        }
+        const data = await s3.headObject(params).promise()
+        if (data) {
+          reject(new Error(`The file ${key} already exists in s3`))
+        }
+        resolve()
+      } catch (err) {
+        if (err && !err.statusCode === 404) {
+          reject(new Error(err))
+        }
+        resolve()
+      }
+    })
+  },
+  async getObject(key = requiredParam()) {
     const params = {
       Bucket,
       Key: key,
@@ -21,28 +42,12 @@ module.exports = {
     const inflatedBody = zlib.inflateSync(Buffer.from(Body.toString(), 'base64'))
     return inflatedBody.toString()
   },
-  async uploadFile(args = {}) {
-    const {
-      fileContent = requiredParam('fileContent'),
-      key = requiredParam(),
-    } = args
-
-    const params = {
+  async uploadFile({ fileContent = requiredParam('fileContent'), key = requiredParam() }) {
+    await this.checkFileName(key)
+    return s3.upload({
+      Body: zlib.deflateSync(fileContent).toString('base64'),
       Bucket,
       Key: key,
-    }
-
-    // Checking if the file name already exists in s3
-    await s3.headObject(params, (err, data) => {
-      if (err && !err.statusCode === 404) {
-        throw new Error(err)
-      }
-      if (data) {
-        throw new Error(`The file ${key} already exists in s3`)
-      }
-    })
-
-    params.Body =  zlib.deflateSync(fileContent).toString('base64')
-    return s3.upload(params).promise()
+    }).promise()
 	},
 }

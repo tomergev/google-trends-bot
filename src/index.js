@@ -18,7 +18,7 @@ const job = async () => {
 			fileContent: res,
 			key: `${getDate(JSON.parse(res))}_${geo}`,
 		})
-		console.log(res, 'Successfully uploaded to s3')
+		console.log('Successfully uploaded to s3')
 	} catch (err) {
 		console.error(err)
 	}
