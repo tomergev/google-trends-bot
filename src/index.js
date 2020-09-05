@@ -27,7 +27,7 @@ const job = async () => {
 const path = require('path')
 const root = path.dirname(require.main.filename)
 console.log(root)
-detect()
+detect().catch(console.error)
 
 const everyDay = '0 20 * * *' // CronJob occuring every day at 20:00, 8pm
 new CronJob(everyDay, job, null, true, 'America/Los_Angeles')
