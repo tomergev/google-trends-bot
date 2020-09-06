@@ -7,12 +7,6 @@ const s3 = require('./services/s3')
 
 const PATH = 'default.trendingSearchesDays.0' // Path to the current trending searches for the current date
 
-// Get the date from googleTrends.dailyTrends response
-const getDate = (trends) => {
-	const date = get(trends, `${PATH}.date`)
-	return date
-}
-
 const fetchTrendingSentiment = async (trends, index = 0) => {
 	const trend = get(trends, `${PATH}.trendingSearches.${index}`)
 	const { query } = trend.title || {}
@@ -37,16 +31,11 @@ const job = async () => {
 		const geo = 'US'
 		const trends = await googleTrends.dailyTrends({ geo })
 		const parsedTrends = JSON.parse(trends)
-		// const trend = await fetchTrendingSentiment(parsedTrends)
-		// await s3.uploadFile({
-		// 	fileContent: res,
-		// 	key: `${getDate(parsedTrends)}_${geo}`,
-		// })
-		await Promise.all([
+		Promise.all([
 			fetchTrendingSentiment(parsedTrends).catch(console.error),
 			s3.uploadFile({
 				fileContent: trends,
-				key: `${getDate(parsedTrends)}_${geo}`,
+				key: `${get(trends, `${PATH}.date`)}_${geo}`,
 			})
 				.then(() => console.log('Successfully uploaded to s3'))
 				.catch(console.error)
@@ -56,8 +45,6 @@ const job = async () => {
 	}
 }
 
-job()
-
-// const everyDay = '0 20 * * *' // CronJob occuring every day at 20:00, 8pm
-// new CronJob(everyDay, job, null, true, 'America/Los_Angeles')
-// console.log(`CronJob occuring every ${everyDay}`)
+const everyDay = '0 20 * * *' // CronJob occuring every day at 20:00, 8pm
+new CronJob(everyDay, job, null, true, 'America/Los_Angeles')
+console.log(`CronJob occuring every ${everyDay}`)

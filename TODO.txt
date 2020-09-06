@@ -1,3 +1,4 @@
-1. Use native JS xml http request (because I am interested in learning this)
-2. Create my own verision of lodasg's get function
-3. Make all paths absolute paths and congfigure this to work in Heroku
+1. Make request for twitter's api
+2. Use native JS xml http request (because I am interested in learning this)
+3. Create my own verision of lodasg's get function
+4. Make all paths absolute paths and congfigure this to work in Heroku
