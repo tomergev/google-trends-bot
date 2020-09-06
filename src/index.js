@@ -35,7 +35,7 @@ const job = async () => {
 			fetchTrendingSentiment(parsedTrends).catch(console.error),
 			s3.uploadFile({
 				fileContent: trends,
-				key: `${get(trends, `${PATH}.date`)}_${geo}`,
+				key: `${get(parsedTrends, `${PATH}.date`)}_${geo}`,
 			})
 				.then(() => console.log('Successfully uploaded to s3'))
 				.catch(console.error)
