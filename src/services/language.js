@@ -1,11 +1,7 @@
 const axios = require('axios')
 
-const requiredParam = (param = 'query') => {
-  throw new Error(`The required param, ${param}, was not provided`)
-}
-
 module.exports = {
-  analyzeSentiment(query = requiredParam()) {
+  analyzeSentiment(query) {
     const document = {
       content: query,
       type: 'PLAIN_TEXT',

@@ -7,13 +7,9 @@ const s3 = new S3({
 	secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
 })
 
-const requiredParam = (param = 'key') => {
-  throw new Error(`The required param, ${param}, was not provided`)
-}
-
 module.exports = {
   // Checking if the file name already exists in s3
-  checkFileName(key = requiredParam()) {
+  checkFileName(key) {
     return new Promise(async (resolve, reject) => {
       try {
         const params = {
@@ -33,7 +29,7 @@ module.exports = {
       }
     })
   },
-  async getObject(key = requiredParam()) {
+  async getObject(key) {
     const params = {
       Bucket,
       Key: key,
@@ -42,12 +38,15 @@ module.exports = {
     const inflatedBody = zlib.inflateSync(Buffer.from(Body.toString(), 'base64'))
     return inflatedBody.toString()
   },
-  async uploadFile({ fileContent = requiredParam('fileContent'), key = requiredParam() }) {
+  async uploadFile({ fileContent, key }) {
     await this.checkFileName(key)
-    return s3.upload({
+    const file = await s3.upload({
       Body: zlib.deflateSync(fileContent).toString('base64'),
       Bucket,
       Key: key,
     }).promise()
+    console.log('Successfully uploaded to s3')
+    return file
+
 	},
 }
