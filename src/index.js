@@ -16,7 +16,7 @@ const fetchTrendingSentiment = async (trends, index = 0) => {
 	// If the sentiment score is higher than 0 (positive sentiment), then return the data concerning this trend
 	// If the sentiment score is 0 or lower, than recursively call this same function again
 	if (sentimentScore > 0) {
-		const tweet = `Today, the search: ${query}, has been searched for ${trend.formattedTraffic} ${trend.shareUrl}`
+		const tweet = `${query}, has been searched for ${trend.formattedTraffic} ${trend.shareUrl} ${get(trend, 'image.newsUrl')}`
 		return await postTweet(tweet)
 	}
 	return await fetchTrendingSentiment(trends, index += 1)
@@ -27,6 +27,7 @@ const job = async () => {
 		const geo = 'US'
 		const trends = await googleTrends.dailyTrends({ geo })
 		const parsedTrends = JSON.parse(trends)
+		// This Promise.all must be awaited in order to have proper error handling
 		await Promise.all([
 			fetchTrendingSentiment(parsedTrends),
 			s3.uploadFile({
